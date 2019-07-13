@@ -1,5 +1,4 @@
 class Song
-  #extend Concerns::Findable
   attr_accessor :name
   attr_reader :artist, :genre
   @@all = []
@@ -43,7 +42,21 @@ class Song
   end
 
   def self.find_or_create_by_name(name)
-    find_by_name(name) || create(name)
+    find_by_name(name) ? find_by_name(name) : create(name)
+  end
+
+  def self.new_from_filename(file_name)
+   parsed_file = file_name.chomp(".mp3").split(" - ")
+   new_song = self.find_or_create_by_name(parsed_file[1])
+   new_song.artist = Artist.find_or_create_by_name(parsed_file[0])
+   new_song.genre = Genre.find_or_create_by_name(parsed_file[2])
+   new_song
+ end
+
+ def self.create_from_filename(file_name)
+    new_song = self.new_from_filename(file_name)
+    new_song.save
+    new_song
   end
 
 end
